@@ -21,19 +21,29 @@ public class ScannerManager {
     @Override
     public void onHostResume() {
       Log.d(TAG, "onHostResume");
-      compatRegisterReceiver(this.reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
     }
 
     @Override
     public void onHostPause() {
       Log.d(TAG, "onHostPause");
-      compatRegisterReceiver(this.reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
     }
 
     @Override
     public void onHostDestroy() {
       Log.d(TAG, "onHostDestroy");
       reactContext.unregisterReceiver(barcodeBroadcastReceiver);
+    }
+
+    private void compatRegisterReceiver(
+      Context context, BroadcastReceiver receiver, IntentFilter filter, boolean exported) {
+      if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
+        context.registerReceiver(
+          receiver, filter, exported ? Context.RECEIVER_EXPORTED : Context.RECEIVER_NOT_EXPORTED);
+      } else {
+        context.registerReceiver(receiver, filter);
+      }
     }
   };
 

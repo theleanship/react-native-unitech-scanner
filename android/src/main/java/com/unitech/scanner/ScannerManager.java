@@ -20,7 +20,7 @@ public class ScannerManager {
     @Override
     public void onHostResume() {
       Log.d(TAG, "onHostResume");
-      if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
+      if (Build.VERSION.SDK_INT >= 34 && reactContext.getApplicationInfo().targetSdkVersion >= 34) {
         reactContext.registerReceiver(barcodeBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
       } else {
         reactContext.registerReceiver(barcodeBroadcastReceiver, intentFilter);
@@ -44,7 +44,7 @@ public class ScannerManager {
     this.reactContext = reactContext;
     this.scanManager = new ScanManager();
     this.barcodeBroadcastReceiver = new BarcodeBroadcastReceiver(reactContext);
-    if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
+    if (Build.VERSION.SDK_INT >= 34 && reactContext.getApplicationInfo().targetSdkVersion >= 34) {
       reactContext.registerReceiver(this.barcodeBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
     } else {
       reactContext.registerReceiver(this.barcodeBroadcastReceiver, intentFilter);

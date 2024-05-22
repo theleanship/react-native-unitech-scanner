@@ -21,13 +21,13 @@ public class ScannerManager {
     @Override
     public void onHostResume() {
       Log.d(TAG, "onHostResume");
-      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      compatRegisterReceiver(this.reactContext, barcodeBroadcastReceiver, intentFilter, true);
     }
 
     @Override
     public void onHostPause() {
       Log.d(TAG, "onHostPause");
-      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      compatRegisterReceiver(this.reactContext, barcodeBroadcastReceiver, intentFilter, true);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.unitech.scanner;
 
 import android.os.Build;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.device.ScanManager;
@@ -21,13 +20,17 @@ public class ScannerManager {
     @Override
     public void onHostResume() {
       Log.d(TAG, "onHostResume");
-      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
+        reactContext.registerReceiver(barcodeBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+      } else {
+        reactContext.registerReceiver(barcodeBroadcastReceiver, intentFilter);
+      }
     }
 
     @Override
     public void onHostPause() {
       Log.d(TAG, "onHostPause");
-      compatRegisterReceiver(reactContext, barcodeBroadcastReceiver, intentFilter, true);
+      reactContext.unregisterReceiver(barcodeBroadcastReceiver);
     }
 
     @Override
@@ -35,23 +38,17 @@ public class ScannerManager {
       Log.d(TAG, "onHostDestroy");
       reactContext.unregisterReceiver(barcodeBroadcastReceiver);
     }
-
-    private void compatRegisterReceiver(
-      Context context, BroadcastReceiver receiver, IntentFilter filter, boolean exported) {
-      if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
-        context.registerReceiver(
-          receiver, filter, exported ? Context.RECEIVER_EXPORTED : Context.RECEIVER_NOT_EXPORTED);
-      } else {
-        context.registerReceiver(receiver, filter);
-      }
-    }
   };
 
   public ScannerManager(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
     this.scanManager = new ScanManager();
     this.barcodeBroadcastReceiver = new BarcodeBroadcastReceiver(reactContext);
-    compatRegisterReceiver(reactContext, this.barcodeBroadcastReceiver, this.intentFilter, true);
+    if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
+      reactContext.registerReceiver(this.barcodeBroadcastReceiver, intentFilter, Context.RECEIVER_EXPORTED);
+    } else {
+      reactContext.registerReceiver(this.barcodeBroadcastReceiver, intentFilter);
+    }
     this.reactContext.addLifecycleEventListener(lifecycleEventListener);
   }
 
@@ -106,22 +103,5 @@ public class ScannerManager {
     boolean result = scanManager.unlockTrigger();
     Log.d(TAG, "unlockTrigger: " + result);
     return result;
-  }
-
-  /**
-   * Starting with Android 14, apps and services that target Android 14 and use context-registered
-   * receivers are required to specify a flag to indicate whether or not the receiver should be
-   * exported to all other apps on the device: either RECEIVER_EXPORTED or RECEIVER_NOT_EXPORTED
-   *
-   * <p>https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
-   */
-  private void compatRegisterReceiver(
-      Context context, BroadcastReceiver receiver, IntentFilter filter, boolean exported) {
-    if (Build.VERSION.SDK_INT >= 34 && context.getApplicationInfo().targetSdkVersion >= 34) {
-      context.registerReceiver(
-          receiver, filter, exported ? Context.RECEIVER_EXPORTED : Context.RECEIVER_NOT_EXPORTED);
-    } else {
-      context.registerReceiver(receiver, filter);
-    }
   }
 }

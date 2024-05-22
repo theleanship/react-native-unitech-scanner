@@ -228,5 +228,5 @@
 		"eslint-plugin-react": "^7.22.0",
 		"eslint-plugin-react-native": "^3.10.0"
 	},
-  "packageManager": "yarn@4.2.2"
+	"packageManager": "yarn@4.2.2"
 }
